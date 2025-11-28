@@ -1,0 +1,9 @@
+AUTH_ACCOUNT: #réf. user_id > USER > réf. user_id, email, password
+USER: réf. user_id, name, full_name, username, bio, job, avatar
+:
+RDV: #réf. client_id > USER > réf. user_id, client_name, client_email, client_tel, client_societe, start_date, end_date, state
+
+LINK: #réf. user_id > USER > réf. user_id, url, title, icon, position
+:
+:
+DISPO: #réf. user_id > USER > réf. user_id, date

@@ -1,0 +1,11 @@
+AUTH_ACCOUNT: email, password
+AUTHENTICATE_TO, 11 USER, 11 AUTH_ACCOUNT
+RDV: client_name, client_email, client_tel, client_societe, start_date, end_date, state
+
+RELATE_TO, 0N USER, 0N LINK
+USER: name, full_name, username, bio, job, avatar
+REGISTER, 0N USER, 0N RDV
+
+LINK: url, title, icon, position
+IS, 0N DISPO, 0N USER
+DISPO: date, start_time, end_time
