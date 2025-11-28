@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import cookie, { type FastifyCookieOptions } from "@fastify/cookie";
 import cors from "@fastify/cors";
 import Fastify, { type FastifyRequest } from "fastify";

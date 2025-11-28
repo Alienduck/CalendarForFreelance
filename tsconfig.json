@@ -7,7 +7,9 @@
     "outDir": "dist/",
     "types": ["node"],
     "module": "NodeNext",
-    "moduleResolution": "NodeNext"
+    "moduleResolution": "NodeNext",
+    "skipLibCheck": true,
+    "noEmit": true,
   },
   "include": ["backend/**/*", "dist/server.js"],
   "exclude": ["**/*.test.ts"]
