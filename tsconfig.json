@@ -9,8 +9,8 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "skipLibCheck": true,
-    "noEmit": true,
+    // "noEmit": true,
   },
-  "include": ["backend/**/*", "dist/server.js"],
+  "include": ["src/**/*", "dist/server.js"],
   "exclude": ["**/*.test.ts"]
 }
