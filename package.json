@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "dev:client": "vite",
     "dev": "vite",
     "build": "tsc",
     "lint": "biome lint",
