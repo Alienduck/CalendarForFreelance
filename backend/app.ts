@@ -6,6 +6,9 @@ import {
 	validatorCompiler,
 	type ZodTypeProvider,
 } from "fastify-type-provider-zod";
+import { Repository } from "./db/db.js";
+import { type User, type UserInput, ZUserInput } from "./models/user.js";
+import { mapErr } from "./plugins/mapErr.js";
 import { type JwtClaims, TokenManager } from "./plugins/token.js";
 
 declare module "fastify" {
@@ -38,7 +41,7 @@ function start_web_server() {
 	web_server.setValidatorCompiler(validatorCompiler);
 	web_server.setSerializerCompiler(serializerCompiler);
 
-	// TODO repo
+	const repo = new Repository();
 
 	web_server.get("/", async () => {
 		return { message: "Hello world !" };
@@ -60,11 +63,41 @@ function start_web_server() {
 
 	web_server.get("/claims", async (req) => {
 		if (!req.claims) {
-			throw new Error("not_authenticated");
+			throw new Error("not authenticated");
 		}
 
 		return req.claims;
 	});
+
+	web_server.get("/user", async () => {
+		try {
+			const res: User[] = await repo.getUsers();
+			if (!res) {
+				throw new Error("users not found");
+			}
+			return { users: res, message: "All users:" };
+		} catch (err) {
+			throw mapErr(err);
+		}
+	});
+
+	web_server.post(
+		"/user",
+		{
+			schema: {
+				body: ZUserInput,
+			},
+		},
+		async (req) => {
+			const newUser: UserInput = req.body;
+			try {
+				const res: User = await repo.postUser(newUser);
+				return { user: res, message: "New user created." };
+			} catch (err) {
+				throw mapErr(err);
+			}
+		},
+	);
 
 	web_server.setErrorHandler((error, request, reply) => {
 		request.log.error(error);
@@ -80,3 +113,5 @@ function start_web_server() {
 		}
 	});
 }
+
+start_web_server();

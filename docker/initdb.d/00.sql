@@ -35,7 +35,6 @@ CREATE TABLE IF NOT EXISTS links (
 );
 
 -- 4. TABLE AVAILABILITIES (Disponibilités)
--- J'ai ajouté start_time et end_time, car une date seule ne suffit pas
 CREATE TABLE IF NOT EXISTS availabilities (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -44,7 +43,7 @@ CREATE TABLE IF NOT EXISTS availabilities (
     day_of_week INTEGER CHECK (day_of_week BETWEEN 0 AND 6), 
     
     -- Option B: Date spécifique (ex: 2023-12-25) - Prioritaire sur le jour de semaine
-    specific_date DATE,
+    date DATE,
 
     start_time TIME NOT NULL, -- ex: 09:00:00
     end_time TIME NOT NULL,   -- ex: 18:00:00
@@ -68,7 +67,7 @@ CREATE TABLE IF NOT EXISTS appointments (
     end_date TIMESTAMP WITH TIME ZONE NOT NULL,
     
     -- Statut (pending, confirmed, cancelled)
-    status TEXT DEFAULT 'confirmed',
+    status TEXT DEFAULT 'Schedule',
     
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
