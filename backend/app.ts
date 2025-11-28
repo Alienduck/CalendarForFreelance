@@ -6,7 +6,7 @@ import {
 	validatorCompiler,
 	type ZodTypeProvider,
 } from "fastify-type-provider-zod";
-import { type JwtClaims, TokenManager } from "./token.js";
+import { type JwtClaims, TokenManager } from "./plugins/token.js";
 
 declare module "fastify" {
 	interface FastifyRequest {
