@@ -41,6 +41,9 @@ importers:
       postgres:
         specifier: ^3.4.7
         version: 3.4.7
+      react:
+        specifier: ^19.2.0
+        version: 19.2.0
       zod:
         specifier: ^4.1.12
         version: 4.1.12
@@ -1036,6 +1039,10 @@ packages:
 
   quick-format-unescaped@4.0.4:
     resolution: {integrity: sha512-tYC1Q1hgyRuHgloV/YXs2w15unPVh8qfu/qCTfhTYamaw7fyhumKa2yGpdSo87vY32rIclj+4fWYQXUMs9EHvg==}
+
+  react@19.2.0:
+    resolution: {integrity: sha512-tmbWg6W31tQLeB5cdIBOicJDJRR2KzXsV7uSK9iNfLWQ5bIZfxuPEHp7M8wiHyHnn0DD1i7w3Zmin0FtkrwoCQ==}
+    engines: {node: '>=0.10.0'}
 
   readline2@1.0.1:
     resolution: {integrity: sha512-8/td4MmwUB6PkZUbV25uKz7dfrmjYWxsW8DVfibWdlHRk/l/DfHKn4pU+dfcoGLFgWOdyGCzINRQD7jn+Bv+/g==}
@@ -2230,6 +2237,8 @@ snapshots:
   qs@6.5.3: {}
 
   quick-format-unescaped@4.0.4: {}
+
+  react@19.2.0: {}
 
   readline2@1.0.1:
     dependencies:

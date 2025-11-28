@@ -21,6 +21,7 @@
     "jose": "^6.1.1",
     "lolcatjs": "^2.4.3",
     "postgres": "^3.4.7",
+    "react": "^19.2.0",
     "zod": "^4.1.12",
     "zod-validation-error": "^5.0.0"
   },
