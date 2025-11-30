@@ -33,6 +33,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.6",
+    "@tailwindcss/vite": "^4.1.17",
     "@tsconfig/node22": "^22.0.2",
     "@types/node": "^24.7.1",
     "@types/react": "^19.2.7",
