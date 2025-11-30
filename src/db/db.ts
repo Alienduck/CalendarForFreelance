@@ -1,7 +1,7 @@
 import argon2 from "argon2";
 import postgres from "postgres";
 import type { AuthAccount, AuthAccountInput } from "../models/auth_account.js";
-import type { User, UserInput } from "../models/user.js";
+import type { User, UserInput, UserInputPartial } from "../models/user.js";
 
 const sql = postgres();
 
@@ -76,19 +76,14 @@ export class Repository {
     return res.length ? (res[0] as User) : null;
   }
 
-  async updateUser(id: string, user: UserInput) {
-    const fields = Object.entries(user).map(
-      ([key, value]) => this.sql`${this.sql.unsafe(key)} = ${value}`,
-    );
-    if (fields.length === 0) return null;
-
+  async updateUser(id: string, user: UserInputPartial) {
     const res = await this.sql<User[]>`
-	UPDATE users SET ${fields.reduce((acc, field, i) =>
-    i === 0 ? field : this.sql`${acc} = ${field}`,
-  )}
-	WHERE id = ${id}
-	RETURNING *
-	`;
+      UPDATE users 
+      SET ${this.sql(user)}
+      WHERE id = ${id}
+      RETURNING *
+    `;
+
     return res[0];
   }
 
