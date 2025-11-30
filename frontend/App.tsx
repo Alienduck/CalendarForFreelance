@@ -4,7 +4,7 @@ import { LinkList } from "./components/ui/LinkList";
 import { ProfileHeader } from "./components/ui/ProfileHeader";
 
 const USERNAME = "alienduck";
-const API_URL = "127.0.0.1:1234/api";
+const API_URL = "http://localhost:1234/api";
 
 function App() {
   const [profile, setProfile] = useState<any>(null);
