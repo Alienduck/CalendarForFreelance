@@ -1,5 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { Dashboard } from "./pages/Dashboard";
 import { Landing } from "./pages/Landing";
+import { Login } from "./pages/Login";
 import { Profile } from "./pages/Profile";
 import { Register } from "./pages/Register";
 
@@ -7,13 +9,10 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Route d'accueil */}
         <Route path="/" element={<Landing />} />
-
-        {/* Route d'inscription */}
         <Route path="/register" element={<Register />} />
-
-        {/* Route dynamique pour les profils (ex: /u/alienduck) */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/dashboard" element={<Dashboard />} />{" "}
         <Route path="/u/:username" element={<Profile />} />
       </Routes>
     </BrowserRouter>
