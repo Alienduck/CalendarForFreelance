@@ -42,17 +42,17 @@ export class Repository {
   }
 
   async getUser(id: number) {
-	const res = this.sql<User[]>`
+    const res = this.sql<User[]>`
 	SELECT * FROM users
 	WHERE id = ${id}
 	`;
-	return res[0]
+    return res[0];
   }
 
   async postUser(user: UserInput) {
     const res = await this.sql<User[]>`
         INSERT INTO users (username, full_name, bio, job_title, avatar_url)
-        VALUES (${user.username}, ${user.full_name}, ${user.bio}, ${user.job_title}, ${user.avatar_url})
+        VALUES (${user.username}, ${user.full_name}, ${user.bio ?? null}, ${user.job_title ?? null}, ${user.avatar_url ?? null})
         RETURNING *
         `;
     return res[0];
@@ -96,6 +96,42 @@ export class Repository {
     const res = this.sql<User[]>`
 	DELETE FROM users WHERE id = ${id} RETURNING *
 	`;
+    return res[0];
+  }
+
+  // ... tes méthodes existantes ...
+
+  async getAvailabilities(userId: string, dayOfWeek: number) {
+    return await this.sql<{ start_time: string; end_time: string }[]>`
+        SELECT start_time, end_time 
+        FROM availabilities 
+        WHERE user_id = ${userId} 
+        AND (day_of_week = ${dayOfWeek})
+        ORDER BY start_time ASC
+    `;
+  }
+
+  async getAppointments(userId: string, dateStr: Date) {
+    return await this.sql<{ start_date: Date; end_date: Date }[]>`
+        SELECT start_date, end_date 
+        FROM appointments 
+        WHERE freelance_id = ${userId} 
+        AND start_date::date = ${dateStr}::date
+        AND status = 'confirmed'
+    `;
+  }
+
+  async createAppointment(data: {
+    freelance_id: string;
+    client_name: string;
+    client_email: string;
+    start_date: Date;
+    end_date: Date;
+  }) {
+    const res = await this.sql`
+        INSERT INTO appointments ${this.sql(data)}
+        RETURNING id
+    `;
     return res[0];
   }
 }
