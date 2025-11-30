@@ -35,7 +35,7 @@ function start_web_server() {
     parseOptions: {},
   } as FastifyCookieOptions);
   web_server.register(cors, {
-    origin: "https://localhost:1234",
+    origin: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
