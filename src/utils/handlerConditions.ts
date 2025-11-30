@@ -25,3 +25,11 @@ export function CanInteract() {
     }
   };
 }
+
+export function isLog() {
+  return async (req: FastifyRequest) => {
+    if (!req.claims) {
+      throw new Error("not_authenticated");
+    }
+  };
+}
