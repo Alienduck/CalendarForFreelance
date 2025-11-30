@@ -10,6 +10,7 @@ import {
 // import { Repository } from "./db/db.js";
 import { AppError } from "./plugins/mapErr.js";
 import { type JwtClaims, TokenManager } from "./plugins/token.js";
+import { authAccountRoutes } from "./routes/auth_account.js";
 import { bookingRoutes } from "./routes/booking.js";
 import { userRoutes } from "./routes/user.js";
 
@@ -68,6 +69,7 @@ function start_web_server() {
 
   web_server.register(userRoutes, { prefix: "/api" });
   web_server.register(bookingRoutes, { prefix: "/api" });
+  web_server.register(authAccountRoutes, { prefix: "/api" });
 
   web_server.setErrorHandler((error, request, reply) => {
     request.log.error(error);
