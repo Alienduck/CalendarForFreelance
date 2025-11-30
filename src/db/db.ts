@@ -1,6 +1,6 @@
 import argon2 from "argon2";
 import postgres from "postgres";
-import type { AuthAccount } from "../models/auth_account.js";
+import type { AuthAccount, AuthAccountInput } from "../models/auth_account.js";
 import type { User, UserInput } from "../models/user.js";
 
 const sql = postgres();
@@ -96,6 +96,52 @@ export class Repository {
     const res = await this.sql<User[]>`
 	DELETE FROM users WHERE id = ${id} RETURNING *
 	`;
+    return res[0];
+  }
+
+  async getAuthAccounts() {
+    return await this.sql<AuthAccount[]>`
+    SELECT * FROM auth_accounts
+    `;
+  }
+
+  async getAuthAccount(id: string) {
+    const res = await this.sql<AuthAccount[]>`
+    SELECT * FROM auth_accounts
+    WHERE user_id = ${id}
+    `;
+    return res[0];
+  }
+
+  async postAuthAccount(user_id: string, auth_account: AuthAccountInput) {
+    const res = await this.sql<AuthAccount[]>`
+    INSERT INTO auth_accounts (user_id, email, password_hash)
+    VALUES (${user_id}, ${auth_account.email}, ${auth_account.password_hash})
+    RETURNING *
+    `;
+    return res[0];
+  }
+
+  async updateAuthAccount(user_id: string, update: AuthAccountInput) {
+    const fields = Object.entries(update).map(
+      ([key, value]) => this.sql`${this.sql.unsafe(key)} = ${value}`,
+    );
+    if (fields.length === 0) return null;
+
+    const res = await this.sql<AuthAccount[]>`
+    UPDATE users SET ${fields.reduce((acc, field, i) =>
+      i === 0 ? field : this.sql`${acc} = ${field}`,
+    )}
+    WHERE id = ${user_id}
+    RETURNING *
+    `;
+    return res[0];
+  }
+
+  async deleteAuthAccount(user_id: string) {
+    const res = await this.sql<AuthAccount[]>`
+    DELETE FROM auth_accounts WHERE id = ${user_id} RETURNING *
+    `;
     return res[0];
   }
 
