@@ -41,7 +41,7 @@ export class Repository {
         `;
   }
 
-  async getUser(id: number) {
+  async getUser(id: string) {
     const res = this.sql<User[]>`
 	SELECT * FROM users
 	WHERE id = ${id}
@@ -49,13 +49,13 @@ export class Repository {
     return res[0];
   }
 
-  async postUser(user: UserInput) {
+  async postUser(user: UserInput): Promise<User[]> {
     const res = await this.sql<User[]>`
         INSERT INTO users (username, full_name, bio, job_title, avatar_url)
         VALUES (${user.username}, ${user.full_name}, ${user.bio ?? null}, ${user.job_title ?? null}, ${user.avatar_url ?? null})
         RETURNING *
         `;
-    return res[0];
+    return res;
   }
 
   async getUserProfile(username: string): Promise<User | null> {
@@ -76,7 +76,7 @@ export class Repository {
     return res.length ? (res[0] as User) : null;
   }
 
-  async updateUser(id: number, user: UserInput) {
+  async updateUser(id: string, user: UserInput) {
     const fields = Object.entries(user).map(
       ([key, value]) => this.sql`${this.sql.unsafe(key)} = ${value}`,
     );
@@ -92,14 +92,12 @@ export class Repository {
     return res[0];
   }
 
-  async deleteUser(id: number) {
+  async deleteUser(id: string) {
     const res = this.sql<User[]>`
 	DELETE FROM users WHERE id = ${id} RETURNING *
 	`;
     return res[0];
   }
-
-  // ... tes méthodes existantes ...
 
   async getAvailabilities(userId: string, dayOfWeek: number) {
     return await this.sql<{ start_time: string; end_time: string }[]>`
