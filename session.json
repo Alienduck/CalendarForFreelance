@@ -10,5 +10,10 @@
         "username": null
     },
     "cookies": [],
-    "headers": []
+    "headers": [
+        {
+            "name": "Accept",
+            "value": "application/json, */*;q=0.5"
+        }
+    ]
 }
