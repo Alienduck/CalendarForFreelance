@@ -30,20 +30,20 @@ export function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-100 p-8">
+    <div className="min-h-screen flex items-center justify-center bg-slate-900 p-4">
+      <div className="w-full max-w-md bg-slate rounded-2xl shadow-xl border border-slate-100 p-8">
         <div className="text-center mb-8">
           <div className="bg-blue-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600">
             <LogIn size={24} />
           </div>
-          <h1 className="text-2xl font-bold text-slate-900">Bon retour !</h1>
+          <h1 className="text-2xl font-bold text-slate-200">Bon retour !</h1>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-4">
           <input
             type="email"
             placeholder="Email"
-            className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-slate-50"
+            className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-slate-800"
             value={formData.email}
             onChange={(e) =>
               setFormData({ ...formData, email: e.target.value })
@@ -52,7 +52,7 @@ export function Login() {
           <input
             type="password"
             placeholder="Mot de passe"
-            className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-slate-50"
+            className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-slate-800"
             value={formData.password}
             onChange={(e) =>
               setFormData({ ...formData, password: e.target.value })
@@ -61,7 +61,7 @@ export function Login() {
           <button
           type="submit"
             disabled={loading}
-            className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition flex justify-center items-center gap-2"
+            className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-slate font-bold rounded-xl transition flex justify-center items-center gap-2"
           >
             {loading && <Loader2 className="animate-spin" />} Se connecter
           </button>

@@ -43,16 +43,16 @@ export function Register() {
   const password_id = useId();
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-      <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-slate-100">
+    <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
+      <div className="bg-slate p-8 rounded-2xl shadow-xl w-full max-w-md border border-slate-100">
         <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-slate-900">Créer un compte</h2>
+          <h2 className="text-2xl font-bold text-slate-200">Créer un compte</h2>
           <p className="text-slate-500 mt-2">Rejoignez CalendarFreelance</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor={full_name_id} className="block text-sm font-medium text-slate-700 mb-1">
+            <label htmlFor={full_name_id} className="block text-sm font-medium text-slate-900 mb-1">
               Nom complet
             </label>
             <input
@@ -69,7 +69,7 @@ export function Register() {
           </div>
 
           <div>
-            <label htmlFor={username_id} className="block text-sm font-medium text-slate-700 mb-1">
+            <label htmlFor={username_id} className="block text-sm font-medium text-slate-900 mb-1">
               Nom d'utilisateur (URL)
             </label>
             <input
@@ -86,7 +86,7 @@ export function Register() {
           </div>
 
           <div>
-            <label htmlFor={email_id} className="block text-sm font-medium text-slate-700 mb-1">
+            <label htmlFor={email_id} className="block text-sm font-medium text-slate-900 mb-1">
               Email
             </label>
             <input
@@ -103,7 +103,7 @@ export function Register() {
           </div>
 
           <div>
-            <label htmlFor={password_id} className="block text-sm font-medium text-slate-700 mb-1">
+            <label htmlFor={password_id} className="block text-sm font-medium text-slate-900 mb-1">
               Mot de passe
             </label>
             <input
@@ -122,14 +122,14 @@ export function Register() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition flex justify-center gap-2"
+            className="w-full py-3 bg-blue-600 text-slate font-bold rounded-lg hover:bg-blue-700 transition flex justify-center gap-2"
           >
             {loading && <Loader2 className="animate-spin" />}
             S'inscrire
           </button>
         </form>
 
-        <p className="text-center mt-6 text-sm text-slate-500">
+        <p className="text-center mt-6 text-sm text-slate-200">
           Déjà un compte ?{" "}
           <Link
             to="/login"
