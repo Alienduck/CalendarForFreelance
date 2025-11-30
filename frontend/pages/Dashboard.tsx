@@ -12,13 +12,22 @@ export function Dashboard() {
 
   useEffect(() => {
     fetch("http://localhost:1234/api/claims", { credentials: "include" })
-      .then((res) => res.json())
-      .then((claims) => {
+      .then(res => {
+        if (!res.ok) throw new Error("Non connecté");
+        return res.json();
+      })
+      .then(claims => {
+        if (!claims.sub) throw new Error("Token invalide");
         return fetch(`http://localhost:1234/api/user/${claims.sub}`);
       })
-      .then((res) => res.json())
-      .then((data) => setUser(data.user))
-      .catch((err) => console.error("Non connecté", err))
+      .then(res => {
+        if (!res.ok) throw new Error("User introuvable");
+        return res.json();
+      })
+      .then(data => setUser(data.user))
+      .catch(err => {
+        console.error("Erreur Auth:", err);
+      })
       .finally(() => setLoading(false));
   }, []);
 
