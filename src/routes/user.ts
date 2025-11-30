@@ -10,7 +10,7 @@ export async function userRoutes(server: FastifyInstance) {
   const repo = new Repository();
 
   fastify.get(
-    "user/username/:username",
+    "/user/username/:username",
     {
       schema: {
         params: z.object({ username: z.string() }),
