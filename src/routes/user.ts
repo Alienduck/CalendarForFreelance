@@ -2,7 +2,7 @@ import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import z from "zod";
 import { Repository } from "../db/db.js";
-import { type User, ZUserInput } from "../models/user.js";
+import { ZUserInput } from "../models/user.js";
 import { mapErr } from "../plugins/mapErr.js";
 
 export async function userRoutes(server: FastifyInstance) {
@@ -10,7 +10,7 @@ export async function userRoutes(server: FastifyInstance) {
   const repo = new Repository();
 
   fastify.get(
-    "/:username",
+    "user/username/:username",
     {
       schema: {
         params: z.object({ username: z.string() }),
@@ -18,11 +18,11 @@ export async function userRoutes(server: FastifyInstance) {
     },
     async (req) => {
       try {
-        const res: User = await repo.getUserProfile(req.params.username);
+        const res = await repo.getUserProfile(req.params.username);
         if (!res) {
           throw new Error("User not found");
         }
-        return { user: res, message: "User found." };
+        return { user: res, message: "Users found." };
       } catch (err) {
         throw mapErr(err);
       }
@@ -45,7 +45,7 @@ export async function userRoutes(server: FastifyInstance) {
     "/user/:id",
     {
       schema: {
-        params: z.object({ id: z.coerce.number().int().min(1) }),
+        params: z.object({ id: z.uuid() }),
       },
     },
     async (req) => {
@@ -85,7 +85,7 @@ export async function userRoutes(server: FastifyInstance) {
     "/user/:id",
     {
       schema: {
-        params: z.object({ id: z.coerce.number().int().min(1) }),
+        params: z.object({ id: z.uuid() }),
         body: ZUserInput,
       },
     },
@@ -106,7 +106,7 @@ export async function userRoutes(server: FastifyInstance) {
     "/user/:id",
     {
       schema: {
-        params: z.object({ id: z.coerce.number().int().min(1) }),
+        params: z.object({ id: z.uuid() }),
       },
     },
     async (req) => {
