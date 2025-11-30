@@ -14,6 +14,7 @@ export function Login() {
       const res = await fetch("http://localhost:1234/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify(formData),
       });
       if (res.ok) {
@@ -58,7 +59,7 @@ export function Login() {
             }
           />
           <button
-          type="button"
+          type="submit"
             disabled={loading}
             className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition flex justify-center items-center gap-2"
           >
