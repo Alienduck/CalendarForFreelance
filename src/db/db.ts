@@ -160,6 +160,51 @@ export class Repository {
     `;
   }
 
+  async addAvailability(
+    userId: string,
+    data: { day_of_week: number; start_time: string; end_time: string },
+  ) {
+    return await this.sql`
+      INSERT INTO availabilities (user_id, day_of_week, start_time, end_time)
+      VALUES (${userId}, ${data.day_of_week}, ${data.start_time}, ${data.end_time})
+      RETURNING *
+    `;
+  }
+
+  async getAllAvailabilities(userId: string) {
+    return await this.sql`
+      SELECT id, day_of_week, start_time, end_time 
+      FROM availabilities 
+      WHERE user_id = ${userId}
+      ORDER BY day_of_week ASC, start_time ASC
+    `;
+  }
+
+  async deleteAvailability(id: string, userId: string) {
+    return await this.sql`
+      DELETE FROM availabilities 
+      WHERE id = ${id} AND user_id = ${userId}
+      RETURNING *
+    `;
+  }
+
+  async getFreelanceAppointments(userId: string) {
+    return await this.sql`
+      SELECT * FROM appointments 
+      WHERE freelance_id = ${userId}
+      ORDER BY start_date DESC
+    `;
+  }
+
+  async cancelAppointment(id: string, userId: string) {
+    return await this.sql`
+      UPDATE appointments 
+      SET status = 'cancelled'
+      WHERE id = ${id} AND freelance_id = ${userId}
+      RETURNING *
+    `;
+  }
+
   async getAppointments(userId: string, dateStr: Date) {
     return await this.sql<{ start_date: Date; end_date: Date }[]>`
         SELECT start_date, end_date 
