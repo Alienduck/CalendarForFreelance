@@ -2,7 +2,12 @@ import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import z from "zod";
 import { Repository } from "../db/db.js";
-import { ZAuthAccountInput } from "../models/auth_account.js";
+import {
+  type AuthAccountInput,
+  ZAuthAccountInput,
+} from "../models/auth_account.js";
+import { ZRegister } from "../models/register.js";
+import type { UserInput } from "../models/user.js";
 import { mapErr } from "../plugins/mapErr.js";
 
 export async function authAccountRoutes(server: FastifyInstance) {
@@ -56,7 +61,10 @@ export async function authAccountRoutes(server: FastifyInstance) {
           throw new Error("User not found");
         }
         try {
-          const auth_account = repo.postAuthAccount(user.id, req.body);
+          const auth_account = repo.postAuthAccount(user.id, {
+            email: req.body.email,
+            password_hash: await repo.hashPassword(req.body.password_hash),
+          } as AuthAccountInput);
           if (!auth_account) {
             throw new Error("Failed to create Auth Account");
           }
@@ -65,6 +73,45 @@ export async function authAccountRoutes(server: FastifyInstance) {
           throw mapErr(err);
         }
       } catch (err) {
+        throw mapErr(err);
+      }
+    },
+  );
+
+  fastify.post(
+    "/auth/register",
+    {
+      schema: {
+        body: ZRegister,
+      },
+    },
+    async (req, reply) => {
+      const { username, full_name, email, password } = req.body;
+
+      try {
+        const users = await repo.postUser({
+          username,
+          full_name,
+        } as UserInput);
+
+        if (!users || users.length === 0) {
+          throw new Error("Failed to create user");
+        }
+        const newUser = users[0];
+
+        const hashedPassword = await repo.hashPassword(password);
+
+        await repo.postAuthAccount(newUser.id, {
+          email: email,
+          password_hash: hashedPassword,
+        } as AuthAccountInput);
+
+        return reply.status(201).send({
+          message: "Account created successfully",
+          user: newUser,
+        });
+      } catch (err) {
+        server.log.error(err);
         throw mapErr(err);
       }
     },
