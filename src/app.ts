@@ -8,6 +8,7 @@ import {
   type ZodTypeProvider,
 } from "fastify-type-provider-zod";
 import { Repository } from "./db/db.js";
+import { AppError } from "./plugins/mapErr.js";
 import { type JwtClaims, TokenManager } from "./plugins/token.js";
 import { bookingRoutes } from "./routes/booking.js";
 import { userRoutes } from "./routes/user.js";
@@ -75,6 +76,10 @@ function start_web_server() {
 
   web_server.setErrorHandler((error, request, reply) => {
     request.log.error(error);
+
+    if (error instanceof AppError) {
+      reply.status(error.status).send({ error: error.message });
+    }
 
     reply.status(500).send({ message: "Internal Server Error" });
   });
