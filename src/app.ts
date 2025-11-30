@@ -9,6 +9,7 @@ import {
 } from "fastify-type-provider-zod";
 import { Repository } from "./db/db.js";
 import { type JwtClaims, TokenManager } from "./plugins/token.js";
+import { bookingRoutes } from "./routes/booking.js";
 import { userRoutes } from "./routes/user.js";
 
 declare module "fastify" {
@@ -70,6 +71,7 @@ function start_web_server() {
   });
 
   web_server.register(userRoutes, { prefix: "/api" });
+  web_server.register(bookingRoutes, { prefix: "/api" });
 
   web_server.setErrorHandler((error, request, reply) => {
     request.log.error(error);
