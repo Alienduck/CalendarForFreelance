@@ -42,7 +42,7 @@ export class Repository {
   }
 
   async getUser(id: string) {
-    const res = this.sql<User[]>`
+    const res = await this.sql<User[]>`
 	SELECT * FROM users
 	WHERE id = ${id}
 	`;
@@ -93,7 +93,7 @@ export class Repository {
   }
 
   async deleteUser(id: string) {
-    const res = this.sql<User[]>`
+    const res = await this.sql<User[]>`
 	DELETE FROM users WHERE id = ${id} RETURNING *
 	`;
     return res[0];
