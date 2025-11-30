@@ -6,7 +6,10 @@ import {
   LayoutDashboard,
   Link as LinkIcon,
   Loader2,
+  LogOut,
+  Plus,
   Save,
+  Settings,
   Trash2,
   User,
   XCircle,
@@ -29,6 +32,20 @@ export function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("profile");
   const navigate = useNavigate();
+
+  // IDs pour l'accessibilité (Profil)
+  const nameId = useId();
+  const jobId = useId();
+  const bioId = useId();
+
+  // IDs pour l'accessibilité (Liens)
+  const linkTitleId = useId();
+  const linkUrlId = useId();
+
+  // IDs pour l'accessibilité (Dispos)
+  const dispoDayId = useId();
+  const dispoStartId = useId();
+  const dispoEndId = useId();
 
   // State Liens
   const [newLink, setNewLink] = useState({ title: "", url: "" });
@@ -89,15 +106,20 @@ export function Dashboard() {
   const handleAddLink = async (e: React.FormEvent) => {
     e.preventDefault();
     setAddingLink(true);
-    await fetch("http://localhost:1234/api/links", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify(newLink),
-    });
-    setNewLink({ title: "", url: "" });
-    setAddingLink(false);
-    fetchUser();
+    try {
+      await fetch("http://localhost:1234/api/links", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(newLink),
+      });
+      setNewLink({ title: "", url: "" });
+      fetchUser();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setAddingLink(false);
+    }
   };
 
   const handleDeleteLink = async (id: string) => {
@@ -112,16 +134,31 @@ export function Dashboard() {
   // --- HANDLERS DISPOS ---
   const handleAddDispo = async (e: React.FormEvent) => {
     e.preventDefault();
-    await fetch("http://localhost:1234/api/schedule/availabilities", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({
-        ...newDispo,
-        day_of_week: Number(newDispo.day_of_week),
-      }),
-    });
-    fetchSchedule();
+    try {
+      const res = await fetch(
+        "http://localhost:1234/api/schedule/availabilities",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          // IMPORTANT : On s'assure que day_of_week est bien un nombre
+          body: JSON.stringify({
+            ...newDispo,
+            day_of_week: Number(newDispo.day_of_week),
+          }),
+        },
+      );
+
+      if (!res.ok) {
+        const error = await res.json();
+        alert(`Erreur ajout dispo: " + (error.message || "Inconnue")`);
+        return;
+      }
+
+      fetchSchedule();
+    } catch (err) {
+      console.error("Erreur réseau dispo", err);
+    }
   };
 
   const handleDeleteDispo = async (id: string) => {
@@ -225,22 +262,50 @@ export function Dashboard() {
             <div className="bg-slate-900 rounded-2xl shadow-lg border border-slate-800 p-8">
               <form onSubmit={handleUpdateProfile} className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-6">
-                  <InputGroup
-                    label="Nom Complet"
-                    value={user.full_name}
-                    onChange={(v: string) => setUser({ ...user, full_name: v })}
-                  />
-                  <InputGroup
-                    label="Titre / Spécialité"
-                    value={user.job_title}
-                    onChange={(v: string) => setUser({ ...user, job_title: v })}
-                  />
+                  <div className="space-y-2">
+                    <label
+                      htmlFor={nameId}
+                      className="text-sm font-semibold text-slate-400"
+                    >
+                      Nom Complet
+                    </label>
+                    <input
+                      id={nameId}
+                      type="text"
+                      value={user.full_name}
+                      onChange={(e) =>
+                        setUser({ ...user, full_name: e.target.value })
+                      }
+                      className="w-full px-4 py-2 bg-slate-950 border border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-white"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label
+                      htmlFor={jobId}
+                      className="text-sm font-semibold text-slate-400"
+                    >
+                      Titre / Spécialité
+                    </label>
+                    <input
+                      id={jobId}
+                      type="text"
+                      value={user.job_title}
+                      onChange={(e) =>
+                        setUser({ ...user, job_title: e.target.value })
+                      }
+                      className="w-full px-4 py-2 bg-slate-950 border border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-white"
+                    />
+                  </div>
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="text_area" className="text-sm font-semibold text-slate-400">
+                  <label
+                    htmlFor={bioId}
+                    className="text-sm font-semibold text-slate-400"
+                  >
                     Bio
                   </label>
                   <textarea
+                    id={bioId}
                     rows={4}
                     value={user.bio}
                     onChange={(e) => setUser({ ...user, bio: e.target.value })}
@@ -264,24 +329,36 @@ export function Dashboard() {
             <div className="space-y-6">
               <div className="bg-slate-900 rounded-2xl border border-slate-800 p-6">
                 <form onSubmit={handleAddLink} className="flex gap-4">
-                  <input
-                    placeholder="Titre"
-                    className="flex-1 px-4 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white"
-                    value={newLink.title}
-                    onChange={(e) =>
-                      setNewLink({ ...newLink, title: e.target.value })
-                    }
-                    required
-                  />
-                  <input
-                    placeholder="URL"
-                    className="flex-1 px-4 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white"
-                    value={newLink.url}
-                    onChange={(e) =>
-                      setNewLink({ ...newLink, url: e.target.value })
-                    }
-                    required
-                  />
+                  <div className="flex-1">
+                    <label htmlFor={linkTitleId} className="sr-only">
+                      Titre
+                    </label>
+                    <input
+                      id={linkTitleId}
+                      placeholder="Titre"
+                      className="w-full px-4 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white"
+                      value={newLink.title}
+                      onChange={(e) =>
+                        setNewLink({ ...newLink, title: e.target.value })
+                      }
+                      required
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <label htmlFor={linkUrlId} className="sr-only">
+                      URL
+                    </label>
+                    <input
+                      id={linkUrlId}
+                      placeholder="URL"
+                      className="w-full px-4 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white"
+                      value={newLink.url}
+                      onChange={(e) =>
+                        setNewLink({ ...newLink, url: e.target.value })
+                      }
+                      required
+                    />
+                  </div>
                   <button
                     type="submit"
                     disabled={addingLink}
@@ -306,7 +383,7 @@ export function Dashboard() {
                       <p className="font-bold text-white">{link.title}</p>
                     </div>
                     <button
-                    type="button"
+                      type="button"
                       onClick={() => handleDeleteLink(link.id)}
                       className="text-red-400 hover:bg-red-400/10 p-2 rounded-lg"
                     >
@@ -327,11 +404,17 @@ export function Dashboard() {
                 </h3>
                 <form
                   onSubmit={handleAddDispo}
-                  className="flex gap-4 items-end"
+                  className="flex flex-wrap gap-4 items-end"
                 >
                   <div className="space-y-1">
-                    <label htmlFor="select" className="text-xs text-slate-400">Jour</label>
+                    <label
+                      htmlFor={dispoDayId}
+                      className="text-xs text-slate-400"
+                    >
+                      Jour
+                    </label>
                     <select
+                      id={dispoDayId}
                       className="px-4 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white outline-none"
                       value={newDispo.day_of_week}
                       onChange={(e) =>
@@ -349,8 +432,14 @@ export function Dashboard() {
                     </select>
                   </div>
                   <div className="space-y-1">
-                    <label htmlFor="" className="text-xs text-slate-400">Début</label>
+                    <label
+                      htmlFor={dispoStartId}
+                      className="text-xs text-slate-400"
+                    >
+                      Début
+                    </label>
                     <input
+                      id={dispoStartId}
                       type="time"
                       className="px-4 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white"
                       value={newDispo.start_time}
@@ -360,8 +449,14 @@ export function Dashboard() {
                     />
                   </div>
                   <div className="space-y-1">
-                    <label htmlFor="" className="text-xs text-slate-400">Fin</label>
+                    <label
+                      htmlFor={dispoEndId}
+                      className="text-xs text-slate-400"
+                    >
+                      Fin
+                    </label>
                     <input
+                      id={dispoEndId}
                       type="time"
                       className="px-4 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white"
                       value={newDispo.end_time}
@@ -396,7 +491,7 @@ export function Dashboard() {
                       </span>
                     </div>
                     <button
-                    type="button"
+                      type="button"
                       onClick={() => handleDeleteDispo(dispo.id)}
                       className="text-red-400 hover:bg-red-400/10 p-2 rounded-lg"
                     >
@@ -448,7 +543,7 @@ export function Dashboard() {
                   </div>
                   {appt.status !== "cancelled" && (
                     <button
-                    type="button"
+                      type="button"
                       onClick={async () => {
                         if (!confirm("Annuler ce RDV ?")) return;
                         await fetch(
@@ -477,32 +572,24 @@ export function Dashboard() {
   );
 }
 
-function TabButton({ icon, label, active, onClick }: any) {
+function TabButton({
+  icon,
+  label,
+  active,
+  onClick,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  active: boolean;
+  onClick: () => void;
+}) {
   return (
     <button
-    type="button"
+      type="button"
       onClick={onClick}
       className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition ${active ? "bg-blue-600/10 text-blue-400 border border-blue-600/20" : "text-slate-400 hover:bg-slate-800 hover:text-white"}`}
     >
       {icon} {label}
     </button>
-  );
-}
-
-function InputGroup({ label, value, onChange }: any) {
-  const id = useId();
-  return (
-    <div className="space-y-2">
-      <label htmlFor={id} className="text-sm font-semibold text-slate-400">
-        {label}
-      </label>
-      <input
-        id={id}
-        type="text"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full px-4 py-2 bg-slate-950 border border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-white"
-      />
-    </div>
   );
 }

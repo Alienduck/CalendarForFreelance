@@ -6,6 +6,13 @@ import { ZAvailabilitiesInput } from "../models/availabilities.js";
 import { mapErr } from "../plugins/mapErr.js";
 import { isLog } from "../utils/handlerConditions.js";
 
+const AvailabilityInput = z.object({
+  day_of_week: z.number().min(0).max(6),
+  // Regex modifiée pour accepter HH:mm OU HH:mm:ss
+  start_time: z.string().regex(/^\d{2}:\d{2}(:\d{2})?$/),
+  end_time: z.string().regex(/^\d{2}:\d{2}(:\d{2})?$/),
+});
+
 export async function scheduleRoutes(server: FastifyInstance) {
   const fastify = server.withTypeProvider<ZodTypeProvider>();
   const repo = new Repository();
@@ -29,7 +36,7 @@ export async function scheduleRoutes(server: FastifyInstance) {
 
   fastify.post(
     "/schedule/availabilities",
-    { schema: { body: ZAvailabilitiesInput }, preHandler: isLog },
+    { schema: { body: AvailabilityInput }, preHandler: isLog },
     async (req) => {
       try {
         const dispo = await repo.addAvailability(req.claims.sub, req.body);
