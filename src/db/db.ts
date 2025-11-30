@@ -42,11 +42,21 @@ export class Repository {
   }
 
   async getUser(id: string) {
-    const res = await this.sql<User[]>`
-	SELECT * FROM users
-	WHERE id = ${id}
-	`;
-    return res[0];
+    const res = await this.sql`
+      SELECT 
+        u.*,
+        COALESCE(
+          json_agg(
+            json_build_object('id', l.id, 'title', l.title, 'url', l.url, 'icon', l.icon_key)
+          ) FILTER (WHERE l.id IS NOT NULL), 
+          '[]'
+        ) as links
+      FROM users u
+      LEFT JOIN links l ON u.id = l.user_id
+      WHERE u.id = ${id}
+      GROUP BY u.id
+    `;
+    return res[0] as User & { links: string[] };
   }
 
   async postUser(user: UserInput): Promise<User[]> {
@@ -172,5 +182,24 @@ export class Repository {
         RETURNING id
     `;
     return res[0];
+  }
+
+  async addLink(
+    userId: string,
+    link: { title: string; url: string; icon?: string },
+  ) {
+    return await this.sql`
+      INSERT INTO links (user_id, title, url, icon_key)
+      VALUES (${userId}, ${link.title}, ${link.url}, ${link.icon || "link"})
+      RETURNING *
+    `;
+  }
+
+  async deleteLink(linkId: string, userId: string) {
+    return await this.sql`
+      DELETE FROM links
+      WHERE id = ${linkId} AND user_id = ${userId}
+      RETURNING *
+    `;
   }
 }
