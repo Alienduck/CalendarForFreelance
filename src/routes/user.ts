@@ -31,7 +31,7 @@ export async function userRoutes(server: FastifyInstance) {
 
   fastify.get("/user", async () => {
     try {
-      const users = repo.getUsers();
+      const users = await repo.getUsers();
       if (!users) {
         throw new Error("Fail to get users");
       }
@@ -50,7 +50,7 @@ export async function userRoutes(server: FastifyInstance) {
     },
     async (req) => {
       try {
-        const user = repo.getUser(req.params.id);
+        const user = await repo.getUser(req.params.id);
         if (!user) {
           throw new Error("User not found");
         }
@@ -111,7 +111,7 @@ export async function userRoutes(server: FastifyInstance) {
     },
     async (req) => {
       try {
-        const user = repo.deleteUser(req.params.id);
+        const user = await repo.deleteUser(req.params.id);
         if (!user) {
           throw new Error("Fail to delete user");
         }
