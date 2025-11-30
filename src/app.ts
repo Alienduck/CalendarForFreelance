@@ -59,7 +59,7 @@ function start_web_server() {
     }
   });
 
-  web_server.get("/claims", async (req) => {
+  web_server.get("/api/claims", async (req) => {
     if (!req.claims) {
       throw new Error("not authenticated");
     }
