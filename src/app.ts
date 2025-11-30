@@ -1,13 +1,13 @@
 import "dotenv/config";
 import cookie, { type FastifyCookieOptions } from "@fastify/cookie";
 import cors from "@fastify/cors";
-import Fastify, { type FastifyRequest } from "fastify";
+import Fastify from "fastify";
 import {
   serializerCompiler,
   validatorCompiler,
   type ZodTypeProvider,
 } from "fastify-type-provider-zod";
-import { Repository } from "./db/db.js";
+// import { Repository } from "./db/db.js";
 import { AppError } from "./plugins/mapErr.js";
 import { type JwtClaims, TokenManager } from "./plugins/token.js";
 import { bookingRoutes } from "./routes/booking.js";
@@ -18,11 +18,6 @@ declare module "fastify" {
     claims?: JwtClaims;
   }
 }
-
-type CustomFastifyRequest = FastifyRequest & {
-  claims?: JwtClaims;
-  params: { id: number };
-};
 
 function start_web_server() {
   const web_server = Fastify({
@@ -43,7 +38,7 @@ function start_web_server() {
   web_server.setValidatorCompiler(validatorCompiler);
   web_server.setSerializerCompiler(serializerCompiler);
 
-  const repo = new Repository();
+  // const repo = new Repository();
 
   web_server.get("/", async () => {
     return { message: "Hello world !" };
