@@ -9,10 +9,18 @@ import {
 import { ZRegister } from "../models/register.js";
 import type { UserInput } from "../models/user.js";
 import { mapErr } from "../plugins/mapErr.js";
+import { TokenManager } from "../plugins/token.js";
+import { ROLES } from "../utils/handlerConditions.js";
+
+const LoginSchema = z.object({
+  email: z.email(),
+  password: z.string(),
+});
 
 export async function authAccountRoutes(server: FastifyInstance) {
   const fastify = server.withTypeProvider<ZodTypeProvider>();
   const repo = new Repository();
+  const token_manager = new TokenManager();
 
   fastify.get("/auth_account", async () => {
     try {
@@ -42,6 +50,48 @@ export async function authAccountRoutes(server: FastifyInstance) {
         return { auth_account, message: "Auth Account found" };
       } catch (err) {
         mapErr(err);
+      }
+    },
+  );
+
+  fastify.post(
+    "/auth/login",
+    {
+      schema: {
+        body: LoginSchema,
+      },
+    },
+    async (req, reply) => {
+      const { email, password } = req.body;
+
+      try {
+        const isValid = await repo.verifyPassword(email, password);
+        if (!isValid) {
+          return reply
+            .status(401)
+            .send({ message: "Email ou mot de passe incorrect" });
+        }
+        const authAccounts = await repo.getAuthAccounts();
+        const account = authAccounts.find((a) => a.email === email);
+
+        if (!account)
+          return reply.status(401).send({ error: "Compte introuvable" });
+
+        const token = await token_manager.encode({
+          sub: account.user_id,
+          roles: [ROLES.User],
+        });
+
+        reply.setCookie("access_token", token, {
+          path: "/",
+          httpOnly: true,
+          secure: false,
+          sameSite: "lax",
+        });
+
+        return { message: "Connexion réussie", userId: account.user_id };
+      } catch (err) {
+        throw mapErr(err);
       }
     },
   );
