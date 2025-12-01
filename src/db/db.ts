@@ -170,18 +170,19 @@ export class Repository {
       end_time: string;
     },
   ) {
-    // On passe null explicitement si la valeur est undefined
-    return await this.sql<Availabilities[]>`
-      INSERT INTO availabilities (user_id, day_of_week, date, start_time, end_time)
-      VALUES (
-        ${userId}, 
-        ${data.day_of_week ?? null}, 
-        ${data.date ?? null}, 
-        ${data.start_time}, 
-        ${data.end_time}
-      )
-      RETURNING *
-    `[0];
+    const result = await this.sql<Availabilities[]>`
+    INSERT INTO availabilities (user_id, day_of_week, date, start_time, end_time)
+    VALUES (
+      ${userId}, 
+      ${data.day_of_week ?? null}, 
+      ${data.date ?? null}, 
+      ${data.start_time}, 
+      ${data.end_time}
+    )
+    RETURNING *
+  `;
+
+    return result[0];
   }
 
   async getAllAvailabilities(userId: string) {

@@ -46,7 +46,7 @@ export async function scheduleRoutes(server: FastifyInstance) {
         }
 
         const dispo = await repo.addAvailability(req.claims.sub, req.body);
-        return { message: "Disponibilité ajoutée", availability: dispo[0] };
+        return { message: "Disponibilité ajoutée", availability: dispo };
       } catch (err) {
         throw mapErr(err);
       }
