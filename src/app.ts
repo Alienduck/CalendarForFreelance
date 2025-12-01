@@ -1,6 +1,7 @@
 import "dotenv/config";
 import cookie, { type FastifyCookieOptions } from "@fastify/cookie";
 import cors from "@fastify/cors";
+import { addHours } from "date-fns";
 import Fastify from "fastify";
 import {
   serializerCompiler,
@@ -15,6 +16,7 @@ import { bookingRoutes } from "./routes/booking.js";
 import { linkRoutes } from "./routes/link.js";
 import { scheduleRoutes } from "./routes/schedule.js";
 import { userRoutes } from "./routes/user.js";
+import { ROLES } from "./utils/handlerConditions.js";
 
 declare module "fastify" {
   interface FastifyRequest {
@@ -56,9 +58,23 @@ function start_web_server() {
     try {
       const claims = await token_manager.verify(token);
       req.claims = claims;
-    } catch (_) {
+    } catch (err) {
+      req.log.error(err, "Auth: Echec vérification token")
       req.claims = undefined;
     }
+  });
+
+  web_server.get("/token", async (req, res) => {
+    const token = await token_manager.encode({
+      sub: "example",
+      roles: req.claims ? req.claims.roles : [ROLES.User],
+    });
+    res.setCookie("access_token", token, {
+      secure: false, // TODO set to true in production
+      sameSite: false,
+      expires: addHours(new Date(), 1),
+    });
+    res.status(204);
   });
 
   web_server.get("/api/claims", async (req) => {

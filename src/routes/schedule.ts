@@ -38,7 +38,7 @@ export async function scheduleRoutes(server: FastifyInstance) {
 
   fastify.post(
     "/schedule/availabilities",
-    { schema: { body: AvailabilityInput } },
+    { schema: { body: AvailabilityInput }, preHandler: isLog },
     async (req) => {
       try {
         console.log("=== POST /schedule/availabilities ===");
