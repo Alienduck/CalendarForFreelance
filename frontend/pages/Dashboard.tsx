@@ -135,29 +135,30 @@ export function Dashboard() {
   const handleAddDispo = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch(
-        "http://localhost:1234/api/schedule/availabilities",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          // IMPORTANT : On s'assure que day_of_week est bien un nombre
-          body: JSON.stringify({
-            ...newDispo,
-            day_of_week: Number(newDispo.day_of_week),
-          }),
-        },
-      );
+        const cleanStart = newDispo.start_time.slice(0, 5); 
+        const cleanEnd = newDispo.end_time.slice(0, 5);
 
-      if (!res.ok) {
-        const error = await res.json();
-        alert(`Erreur ajout dispo: " + (error.message || "Inconnue")`);
-        return;
-      }
+        const res = await fetch("http://localhost:1234/api/schedule/availabilities", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ 
+                day_of_week: Number(newDispo.day_of_week),
+                start_time: cleanStart,
+                end_time: cleanEnd
+            })
+        });
+        
+        if (!res.ok) {
+            const error = await res.json();
+            console.error("Erreur serveur:", error);
+            alert(`Erreur : ${(error.message || "Impossible d'ajouter")}`);
+            return;
+        }
 
-      fetchSchedule();
+        fetchSchedule();
     } catch (err) {
-      console.error("Erreur réseau dispo", err);
+        console.error("Erreur réseau dispo", err);
     }
   };
 
