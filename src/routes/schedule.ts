@@ -2,13 +2,15 @@ import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import z from "zod";
 import { Repository } from "../db/db.js";
-import { ZAvailabilitiesInput } from "../models/availabilities.js";
 import { mapErr } from "../plugins/mapErr.js";
 import { isLog } from "../utils/handlerConditions.js";
 
 const AvailabilityInput = z.object({
-  day_of_week: z.number().min(0).max(6),
-  // Regex modifiée pour accepter HH:mm OU HH:mm:ss
+  day_of_week: z.number().min(0).max(6).optional(),
+  date: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
   start_time: z.string().regex(/^\d{2}:\d{2}(:\d{2})?$/),
   end_time: z.string().regex(/^\d{2}:\d{2}(:\d{2})?$/),
 });
@@ -39,6 +41,10 @@ export async function scheduleRoutes(server: FastifyInstance) {
     { schema: { body: AvailabilityInput }, preHandler: isLog },
     async (req) => {
       try {
+        if (req.body.day_of_week === undefined && req.body.date === undefined) {
+          throw new Error("Il faut préciser un jour de semaine ou une date");
+        }
+
         const dispo = await repo.addAvailability(req.claims.sub, req.body);
         return { message: "Disponibilité ajoutée", availability: dispo[0] };
       } catch (err) {
@@ -51,8 +57,11 @@ export async function scheduleRoutes(server: FastifyInstance) {
     "/schedule/availabilities/:id",
     { schema: { params: z.object({ id: z.uuid() }) }, preHandler: isLog },
     async (req) => {
-      await repo.deleteAvailability(req.params.id, req.claims.sub);
-      return { message: "Disponibilité supprimée" };
+      const availbility = await repo.deleteAvailability(
+        req.params.id,
+        req.claims.sub,
+      );
+      return { availbility, message: "Disponibilité supprimée" };
     },
   );
 
