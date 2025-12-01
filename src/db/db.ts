@@ -1,6 +1,7 @@
 import argon2 from "argon2";
 import postgres from "postgres";
 import type { AuthAccount, AuthAccountInput } from "../models/auth_account.js";
+import type { Availabilities } from "../models/availabilities.js";
 import type { User, UserInput, UserInputPartial } from "../models/user.js";
 
 const sql = postgres();
@@ -162,13 +163,25 @@ export class Repository {
 
   async addAvailability(
     userId: string,
-    data: { day_of_week: number; start_time: string; end_time: string },
+    data: {
+      day_of_week?: number;
+      date?: string;
+      start_time: string;
+      end_time: string;
+    },
   ) {
-    return await this.sql`
-      INSERT INTO availabilities (user_id, day_of_week, start_time, end_time)
-      VALUES (${userId}, ${data.day_of_week}, ${data.start_time}, ${data.end_time})
+    // On passe null explicitement si la valeur est undefined
+    return await this.sql<Availabilities[]>`
+      INSERT INTO availabilities (user_id, day_of_week, date, start_time, end_time)
+      VALUES (
+        ${userId}, 
+        ${data.day_of_week ?? null}, 
+        ${data.date ?? null}, 
+        ${data.start_time}, 
+        ${data.end_time}
+      )
       RETURNING *
-    `;
+    `[0];
   }
 
   async getAllAvailabilities(userId: string) {
