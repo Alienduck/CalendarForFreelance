@@ -38,9 +38,13 @@ export async function scheduleRoutes(server: FastifyInstance) {
 
   fastify.post(
     "/schedule/availabilities",
-    { schema: { body: AvailabilityInput }, preHandler: isLog },
+    { schema: { body: AvailabilityInput } },
     async (req) => {
       try {
+        console.log("=== POST /schedule/availabilities ===");
+        console.log("req.claims:", req.claims);
+        console.log("req.body:", req.body);
+        if (!req.claims || !req.claims.sub) throw new Error("Non connecté");
         if (req.body.day_of_week === undefined && req.body.date === undefined) {
           throw new Error("Il faut préciser un jour de semaine ou une date");
         }
